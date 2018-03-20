@@ -63,6 +63,13 @@ while [[ true ]]; do
 		continue
 	fi
 
+	#rejecting colons in column name
+	if [[ "$pk_value" = *:* ]]; then
+		echo 
+		echo -e "${RED}Colons Are Not Allowed!${NC}"
+		continue
+	fi
+
 	#check data type of pk
 	if ! check_type "${types[0]}" "$pk_value" ; then
 		echo 
@@ -80,13 +87,20 @@ while [[ true ]]; do
 
 done
 
+# #converting every space into _
+# if [[ "$pk_value" = *" "* ]]; then
+# 	mod_pk_value="$pk_value"
+# 	underscore=" "
+# 	mod_pk_value="${mod_pk_value/" "/$underscore}"
+# fi
+
 record+=("$pk_value")
 
 for (( i = 1; i < $numColumns-1; i++ )); do
 	echo 
-	echo -ne "${PROMPT}Enter Value Of (${names[$i]}) : ${Nc}"
+	
 	while [[ true ]]; do
-		
+		echo -ne "${PROMPT}Enter Value Of (${names[$i]}) : ${Nc}"
 		if ! read val; then
 			return
 		fi
@@ -94,6 +108,13 @@ for (( i = 1; i < $numColumns-1; i++ )); do
 		if ! is_not_null "$val"; then
 			echo 
 			echo -e "${RED}Value Cannot Be Null!${NC}"
+			continue
+		fi
+
+		#rejecting colons in column name
+		if [[ "$val" = *:* ]]; then
+			echo 
+			echo -e "${RED}Colons Are Not Allowed In Column Name!${NC}"
 			continue
 		fi
 
@@ -105,12 +126,17 @@ for (( i = 1; i < $numColumns-1; i++ )); do
 		fi
 		break
 	done
+
+	# replacing every space with _
+	val="${val// /_}"
+
 	record+=("$val")
 done
 
-for (( i = 0; i < $numColumns; i++ )); do
+for (( i = 0; i < $numColumns-1; i++ )); do
 	echo -n "${record[$i]}:" >> "./Databases/$1/$table_name"
 done
+echo "\n" >> "./Databases/$1/$table_name"
 
 echo
 echo -e "${GREEN}Data Inserted to $table_name Successfully${NC}"

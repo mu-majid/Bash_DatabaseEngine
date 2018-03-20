@@ -112,3 +112,41 @@ function is_not_unique {
 	done
 	return $foundflagg
 }
+
+#find value of entered primary key based on the fact that the records are stored
+#with primary key as the first field
+# $1 database, $2 table name, $3 pk value
+function find_record {
+	foundflagg=1
+	lineNumber=1
+	for field in $(cut -f1 -d: "./Databases/$1/$2"); do
+
+		if [[ $field = "$3" ]]; then
+			foundflagg=0
+			rec=($(cut -d: -f1- "./Databases/$1/$2"))
+			let indx=$lineNumber-1
+			old_record="${rec[$indx]}"
+			break
+		fi
+		let lineNumber=$lineNumber+1
+	done
+
+	return $foundflagg
+}
+
+# find colName in a table
+function find_column {
+ 
+    declare -a array=("${!1}")
+    seeking=$2
+    inflag=1
+    indxx=0
+    for element in "${array[@]}"; do
+        if [[ $element == $seeking ]]; then
+            inflag=0
+            break
+        fi
+        let indxx=$indxx+1
+    done
+    return $inflag
+}

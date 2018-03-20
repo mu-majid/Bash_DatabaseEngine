@@ -9,10 +9,17 @@ echo -e "${GREEN}Creating table in ${LBLUE}$1${GREEN} database${NC}"
 echo
 while [[ true ]]; do
 	echo -ne "${PROMPT}Enter The Name Of The Table : ${NC}"
-	
+
 	#back 
 	if ! read table_name; then
 		return
+	fi
+
+	#disallowing special characters in  names --  \ must be handled
+	if [[ $table_name == *['!'@#\$%^\&*()-+\.\/]* ]]; then
+		echo 
+		echo -e "${RED} ! @ # $ % ^ () + . -  are not allowed!${NC}"
+		continue
 	fi
 
 	#check for empty string
@@ -54,6 +61,18 @@ while [[ true ]]; do
 		continue
 	fi
 
+	if [[ "$num_of_cols" =~ ^[-][0-9]+$ ]]; then
+		echo 
+		echo -e "${RED}Number Cannot Be Negative!${NC}"
+		continue
+	fi
+
+	if [[ "$num_of_cols" =~ ^[-+]?[0-9]+\.[0-9]*$ ]]; then
+		echo 
+		echo -e "${RED}Number Cannot Be Float!${NC}"
+		continue
+	fi
+
 	#check if input is not a number
 	re='^[0-9]+$'
 	if ! [[ "$num_of_cols" =~ $re ]]; then
@@ -78,6 +97,12 @@ while [[ true ]]; do
 		return
 	fi
 
+	if [[ $pk_name == *['!'@#\$%^\&*()-+\.\/]* ]]; then
+		echo 
+		echo -e "${RED} ! @ # $ % ^ () + . -  are not allowed!${NC}"
+		continue
+	fi
+
 	#checking for empty string
 	if ! is_not_null $pk_name ; then
 		echo
@@ -96,6 +121,13 @@ while [[ true ]]; do
 	if [[ "$pk_name" = *" "* ]]; then
 		echo 
 		echo -e "${RED}Spaces Are Not Allowed!${NC}"
+		continue
+	fi
+
+	#rejecting colons in column name
+	if [[ "$pk_name" = *:* ]]; then
+		echo 
+		echo -e "${RED}Colons Are Not Allowed!${NC}"
 		continue
 	fi
 
@@ -143,6 +175,12 @@ for (( i = 1; i < $num_of_cols; i++ )); do
 			return
 		fi
 
+		if [[ $name == *['!'@#\$%^\&*()-+\.\/]* ]]; then
+			echo 
+			echo -e "${RED} ! @ # $ % ^ () + . -  are not allowed!${NC}"
+			continue
+		fi
+
 		#checking for empty string
 		if ! is_not_null $name ; then
 			echo
@@ -161,6 +199,13 @@ for (( i = 1; i < $num_of_cols; i++ )); do
 		if [[ "$name" = *" "* ]]; then
 			echo 
 			echo -e "${RED}Spaces Are Not Allowed!${NC}"
+			continue
+		fi
+
+		#rejecting colons in column name
+		if [[ "$name" = *:* ]]; then
+			echo 
+			echo -e "${RED}Colons Are Not Allowed!${NC}"
 			continue
 		fi
 
@@ -209,6 +254,8 @@ done
 
 echo
 echo -e "${GREEN}Table $table_name created Successfully${NC}"
+echo "Press Enter To continue!"
+read
 return
 
 

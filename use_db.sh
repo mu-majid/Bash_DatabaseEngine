@@ -54,7 +54,7 @@ while [[ $keep_alive=true ]]; do
 		4 )
 			. ./insert_into_table.sh $db_name;;
 		5 )
-			. ./update_table.sh $db_name;;
+			. ./update_row.sh $db_name;;
 		6 )
 			. ./delete_row.sh $db_name;;
 		7 )
