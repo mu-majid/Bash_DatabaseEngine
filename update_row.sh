@@ -39,7 +39,7 @@ done
 load_template $1 $table_name
 
 echo 
-echo "Your Table's schema"
+echo -e "${YELLOW}Your Table's schema${NC}"
 echo
 awk -v var=$table_name 'BEGIN {FS=":"; print "\t\tTable Name: " var "\n"} {if(NR>1) printf $1"<"$2">\t\t"} END{printf "\n"}' "./Databases/$1/${table_name}_template"
 echo 
@@ -71,17 +71,13 @@ length="${#old_record_array[@]}"
 
 # show the old record to the user 
 echo 
-echo -e "${YELLOW}Here Is The Record Found.${NC}}"
-awk -v var=$table_name 'BEGIN {FS=":"; print "\t\tTable Name: " var "\n"} {if(NR>1) printf $1"<"$2">\t\t"} END{printf "\n"}' "./Databases/$1/${table_name}_template"
+echo -e "${YELLOW}Here Is The Record Found.${NC}"
+awk -v var=$table_name 'BEGIN {FS=":"; print "\t\tTable Name: " var "\n"} {if(NR>1) printf " "$1"<"$2">\t\t"} END{printf "\n"}' "./Databases/$1/${table_name}_template"
 
-awk -F: -v var=$lineNumber '{  if(NR==var){  for(i = 1; i < NF; i++) {printf "   "$i"\t\t"} printf "\n" }}' "./Databases/$1/$table_name"
+awk -v var=$lineNumber 'BEGIN{FS=":";OFS="\t\t\t";ORS="\n";}{  if(NR==var){ $1=$1; print " "substr($0, 1, length($0)-2)}}' "./Databases/$1/$table_name"
 
 #loading template for the table for column name and datatype
 load_template $1 $table_name #names and numColumns and types
-
-echo "$numColumns"
-echo "${names[@]}"
-echo "${types[*]}"
 
 for (( i = 1; i < $numColumns-2; i++ )); do
 	echo 
@@ -114,14 +110,58 @@ for (( i = 1; i < $numColumns-2; i++ )); do
 	done
 	#from indxx you can get the name and datatype of that column from names and types arrays
 	# prompt the user for new value and check for type
+	
 	while [[ true ]]; do
-		#statements
-	done
+		echo -ne "${PROMPT}Enter New value Of ${names[$indxx]} : "
+		if ! read newVal; then
+			return
+		fi
+		#check for empty string
+		if ! is_not_null "$newVal"; then
+			echo 
+			echo -e "${RED}New Value Cannot Be Null!${NC}"
+			continue
+		fi
 
+		#rejecting colons in column name
+		if [[ "$newVal" = *:* ]]; then
+			echo 
+			echo -e "${RED}Colons Are Not Allowed!${NC}"
+			continue
+		fi
+
+		#validate the datatype
+		if ! check_type "${types[$indxx]}" "$newVal"; then
+			echo 
+			echo -e "${RED}Datatype Mismatch Error\nPlease Refer To Above Schema!${NC}"
+			continue
+		fi
+		break
+	done
+	# replacing every space with _
+	newVal="${newVal// /_}"
+	#updating the old record
+	old_record_array[$indxx]="$newVal"
+	#converting array to string
+	new_line=$( IFS=$':'; echo "${old_record_array[*]}" )
+	#saving new record to file
+	sed -i 's/^'"$pkVal"':.*$/'"$new_line":'/' "./Databases/$1/$table_name"
+	echo 
+	echo -e "${GREEN}Record Updated Successfully${NC}"
+	# check if user want to update another cell in the record
+	echo
+	read -p "Do You Want To Update Another Cell? (y/n) : " -n 1 -r
+	echo    # (optional) move to a new line
+	if [[ $REPLY =~ ^[Yy]$ ]]
+	then
+	    continue
+	else
+		break
+	fi
 done
 
-
-
-# 	record+=("$val")
-# done
-
+echo
+echo -e "${GREEN}You Updated $table_name table Successfully!${NC}"
+echo "Press Enter To continue"
+read
+return

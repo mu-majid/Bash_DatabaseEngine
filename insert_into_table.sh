@@ -10,8 +10,6 @@ echo
 
 while [[ true ]]; do
 	echo -ne "${PROMPT}Enter The Name Of The Table You Want To Insert into: ${NC}"
-	
-
 	#back 
 	if ! read table_name; then
 		return
@@ -46,7 +44,6 @@ echo
 awk -v var=$table_name 'BEGIN {FS=":"; print "\t\tTable Name: " var "\n"} {if(NR>1) printf $1"<"$2">\t\t"} END{printf "\n"}' "./Databases/$1/${table_name}_template"
 echo 
 echo -e "${YELLOW}Please Pay Attention To Column Name And Datatype\nWhile Inserting To Avoid ${RED}Data Corruption${NC}"
-
 
 while [[ true ]]; do
 	echo 
@@ -87,13 +84,6 @@ while [[ true ]]; do
 
 done
 
-# #converting every space into _
-# if [[ "$pk_value" = *" "* ]]; then
-# 	mod_pk_value="$pk_value"
-# 	underscore=" "
-# 	mod_pk_value="${mod_pk_value/" "/$underscore}"
-# fi
-
 record+=("$pk_value")
 
 for (( i = 1; i < $numColumns-1; i++ )); do
@@ -129,14 +119,13 @@ for (( i = 1; i < $numColumns-1; i++ )); do
 
 	# replacing every space with _
 	val="${val// /_}"
-
 	record+=("$val")
 done
 
 for (( i = 0; i < $numColumns-1; i++ )); do
 	echo -n "${record[$i]}:" >> "./Databases/$1/$table_name"
 done
-echo "\n" >> "./Databases/$1/$table_name"
+echo "" >> "./Databases/$1/$table_name"
 
 echo
 echo -e "${GREEN}Data Inserted to $table_name Successfully${NC}"

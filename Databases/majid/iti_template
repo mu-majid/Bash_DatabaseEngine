@@ -2,4 +2,4 @@ pk:id
 id:int
 name:str
 age:int
-track:str
+track:alnum

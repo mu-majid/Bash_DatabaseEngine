@@ -29,6 +29,13 @@ while [[ true ]]; do
 		continue
 	fi
 
+	#rejecting spaces in table name
+	if [[ "$table_name" = *" "* ]]; then
+		echo 
+		echo -e "${RED}Spaces Are Not Allowed!${NC}"
+		continue
+	fi
+
 	#check for existing table name
 	if  find_table $1 $table_name; then
 		echo 
@@ -137,8 +144,7 @@ done
 # appending ti the array
 cols_names+=("$pk_name")
 
-
-echo "Please note, supported datatypes are strings <str>, and integers <int>"
+echo "Please note, supported datatypes are strings <str>, alphanumeric <alnum>, and integers <int>"
 echo -ne "${PROMPT}Enter The Primary Key datatype : ${NC}"
 
 if ! read pk_type; then
@@ -151,6 +157,8 @@ while [[ true ]]; do
 		str )
 			break;;
 		int )
+			break;;
+		alnum )
 			break;;
 		* )
 			echo -ne "${RED}Please Enter A Supported Datatype : ${NC}"
@@ -221,13 +229,14 @@ for (( i = 1; i < $num_of_cols; i++ )); do
 		return
 	fi
 	
-
 	#taking the datatype of the pk column
 	while [[ true ]]; do
 		case $dtype in
 			str )
 				break;;
 			int )
+				break;;
+			alnum )
 				break;;
 			* )
 				echo -ne "${RED}Please Enter A Supported Datatype : ${NC}"
@@ -236,10 +245,8 @@ for (( i = 1; i < $num_of_cols; i++ )); do
 				fi;;
 		esac
 	done
-
 	#appending to the array
 	cols_datatypes+=("$dtype")
-
 done
 
 #creating file representing the table
@@ -257,21 +264,3 @@ echo -e "${GREEN}Table $table_name created Successfully${NC}"
 echo "Press Enter To continue!"
 read
 return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

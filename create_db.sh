@@ -13,7 +13,7 @@ while [[ true ]]; do
 		return
 	fi
 
-	#rejecting spaces in column name
+	#rejecting spaces in db name
 	if [[ "$db_name" = *" "* ]]; then
 		echo 
 		echo -e "${RED}Spaces Are Not Allowed!${NC}"

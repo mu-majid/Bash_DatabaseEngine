@@ -16,7 +16,7 @@ while [[ $keep_alive=true ]]; do
 	echo
 	echo "Simple Database System Written in Bash"
 	echo "This Engine Support Basic CRUD Operations"
-	echo "Please Note Only Supported Datatypes are Int And Str"
+	echo "Please Note Only Supported Datatypes are Int, Str, And Alphanumeric"
 	echo
 	echo -e "${LBLUE}Author : Muhammad Majid Kamel${YELLOW}"
 	echo 

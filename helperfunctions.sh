@@ -87,6 +87,12 @@ function check_type {
 			fi
 			;;
 		str )
+			if [[ "$2" =~ ^[A-Za-z" "]+$ ]]; then
+				return 0
+			else return 1
+			fi
+			;;
+		alnum )
 			if [[ "$2" =~ ^[A-Za-z0-9" "]+$ ]]; then
 				return 0
 			else return 1
@@ -149,4 +155,24 @@ function find_column {
         let indxx=$indxx+1
     done
     return $inflag
+}
+
+
+#find value of entered primary key based on the fact that the records are stored
+#with primary key as the first field
+# $1 database, $2 table name, $3 pk value
+function find_record_and_delete {
+	foundflagg=1
+	lineNumber=1
+	for field in $(cut -f1 -d: "./Databases/$1/$2"); do
+
+		if [[ $field = "$3" ]]; then
+			foundflagg=0
+			sed -i '/^'"$3"':.*$/d' "./Databases/$1/$2"
+			break
+		fi
+		let lineNumber=$lineNumber+1
+	done
+
+	return $foundflagg
 }

@@ -37,7 +37,7 @@ while [[ true ]]; do
 awk -v var=$table_name 'BEGIN {FS=":"; print "\t\tTable Name: " var "\n"} {if(NR>1) printf $1"<"$2">\t\t"} END{printf "\n"}' "./Databases/$1/${table_name}_template"
 
 # printing the table cells from the file itself
-awk -F: '{  for(i = 1; i <= NR; i++){ for(i = 1; i < NF; i++) {printf "   "$i"\t\t"} printf "\n" }}' "./Databases/$1/$table_name"
+awk 'BEGIN{FS=":";OFS="\t\t\t";ORS="\n";}{  $1=$1; print substr($0, 1, length($0)-1) }' "./Databases/$1/$table_name"
 
 echo
 echo
