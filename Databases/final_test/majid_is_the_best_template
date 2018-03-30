@@ -1,0 +1,7 @@
+pk:id
+id:int
+fname:str
+lname:str
+age:int
+zip_code:alnum
+track:alnum
